@@ -1,15 +1,3 @@
-// TODO:
-// 1
-// factor out a selectDisplay that selects the dispay and returns the workable object,
-// so we don't have this select, getDisplay crap all over the place
-// 2
-// make high/low an enum, if we even keep it (I strongly suggest just switching back
-// and forth between high and low every 10 seconds or something)
-// 3
-// factor out the JSON error handling (come on now)
-// 4
-// factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
-
 #include "WeatherWidget.h"
 #include "icons.h"
 
@@ -54,7 +42,6 @@ void WeatherWidget::draw(bool force) {
 
     if (force || model.isChanged()) {
         weatherText(1);
-        drawWeatherIcon(2, model.getCurrentIcon(), 0, 0, 1);
         singleWeatherDeg(3);
         threeDayWeather(4);
         model.setChangedStatus(false);
@@ -157,42 +144,6 @@ void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[]
     TJpgDec.drawJpg(x, y, jpgData, jpgDataSize);
 }
 
-// Take the text output from the weather API and map it to a icon/byte array, then display it
-void WeatherWidget::drawWeatherIcon(int displayIndex, const String &condition, int x, int y, int scale) {
-    const byte *iconStart = NULL;
-    const byte *iconEnd = NULL;
-
-    if (condition == "partly-cloudy-night") {
-        iconStart = m_screenMode == Light ? moonCloudW_start : moonCloudB_start;
-        iconEnd = m_screenMode == Light ? moonCloudW_end : moonCloudB_end;
-    } else if (condition == "partly-cloudy-day") {
-        iconStart = m_screenMode == Light ? sunCloudsW_start : sunCloudsB_start;
-        iconEnd = m_screenMode == Light ? sunCloudsW_end : sunCloudsB_end;
-    } else if (condition == "clear-day") {
-        iconStart = m_screenMode == Light ? sunW_start : sunB_start;
-        iconEnd = m_screenMode == Light ? sunW_end : sunB_end;
-    } else if (condition == "clear-night") {
-        iconStart = m_screenMode == Light ? moonW_start : moonB_start;
-        iconEnd = m_screenMode == Light ? moonW_end : moonB_end;
-    } else if (condition == "snow") {
-        iconStart = m_screenMode == Light ? snowW_start : snowB_start;
-        iconEnd = m_screenMode == Light ? snowW_end : snowB_end;
-    } else if (condition == "rain") {
-        iconStart = m_screenMode == Light ? rainW_start : rainB_start;
-        iconEnd = m_screenMode == Light ? rainW_end : rainB_end;
-    } else if (condition == "fog" || condition == "wind" || condition == "cloudy") {
-        iconStart = m_screenMode == Light ? cloudsW_start : cloudsB_start;
-        iconEnd = m_screenMode == Light ? cloudsW_end : cloudsB_end;
-    } else {
-        Serial.println("unknown weather icon:" + condition);
-    }
-
-    const int size = iconEnd - iconStart;
-    if (iconStart != NULL && size > 0) {
-        showJPG(displayIndex, x, y, iconStart, size, scale);
-    }
-}
-
 // Displays the current temperature on a single screen.
 // doesn't round deg, just removes all text after the decimal
 void WeatherWidget::singleWeatherDeg(int displayIndex) {
@@ -292,7 +243,6 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         // TODO: only works for 3 days
         const int x = (centre - columnSize) + i * columnSize;
 
-        drawWeatherIcon(displayIndex, model.getDayIcon(i), x - 30, 40, 4);
         m_manager.drawCentreString(temps[i], x, 122, temperatureFontSize);
 
         String shortDayName = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1))) - 1];
