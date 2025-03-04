@@ -23,6 +23,10 @@ private:
     uint16_t m_foregroundColor;
     uint16_t m_backgroundColor;
     ScreenMode m_screenMode = Dark;
+
+    String m_startLocation;
+    String m_endLocation;
+    String m_apiKey;
 };
 
 #endif // TRAVELTIMEWIDGET_H
