@@ -26,7 +26,6 @@ private:
     void changeMode();
     void displayClock(int displayIndex, uint32_t background, uint32_t textColor);
     void showJPG(int displayIndex, int x, int y, const byte jpgData[], int size, int scale);
-    void drawWeatherIcon(int displayIndex, const String &condition, int x, int y, int scale);
     void singleWeatherDeg(int displayIndex);
     void weatherText(int displayIndex);
     void threeDayWeather(int displayIndex);
